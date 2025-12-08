@@ -9,6 +9,7 @@ import SideForm from "@/components/SideForm";
 
 export default function AddBreakdown() {
   const [isOpen, setIsOpen] = useState(false);
+  const [type, setType] = useState("income");
   const router = useRouter();
 
   const [date, setDate] = useState("");
@@ -22,9 +23,23 @@ export default function AddBreakdown() {
     setIsOpen((prev) => !prev);
   };
 
+  const tableName =
+    type === "income"
+      ? "income"
+      : type === "spending"
+      ? "spending"
+      : "transfer";
+
+  const buttonClass =
+    type === "income"
+      ? "bg-blue-500 text-white"
+      : type === "spending"
+      ? "bg-red-500 text-white"
+      : "bg-gray-700 text-white";
+
   const handleAddBtn = async () => {
     const { error } = await supabase
-      .from("income")
+      .from(tableName)
       .insert({ date, amount, classification, property, content, memo });
 
     if (error) {
@@ -40,6 +55,7 @@ export default function AddBreakdown() {
     setContent("");
     setMemo("");
     alert("내역이 추가되었습니다.");
+    setIsOpen(false);
     router.push("/breakdown");
   };
 
@@ -47,7 +63,7 @@ export default function AddBreakdown() {
     <div className="w-full">
       <div className="flex justify-end p-4">
         <button
-          className="w-14 h-14 flex justify-center items-center bg-blue-500 rounded-full cursor-pointer"
+          className="fixed bottom-10 right-10 w-14 h-14 flex justify-center items-center bg-blue-500 rounded-full cursor-pointer"
           onClick={handleToggle}
         >
           <FaPlus className="text-white size-8" />
@@ -70,6 +86,9 @@ export default function AddBreakdown() {
             setContent={setContent}
             setMemo={setMemo}
             handleAddBtn={handleAddBtn}
+            classed={buttonClass}
+            type={type}
+            setType={setType}
           />
         )}
       </div>
